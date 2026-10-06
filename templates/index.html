@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ScamCheck helps you check suspicious messages, links, screenshots, and PDF files for common fraud warning signs.">
+    <meta name="theme-color" content="#12345a">
+
+    <title>ScamCheck | Online Fraud Safety</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+{% set current_page = page|default('home') %}
+<body data-page="{{ current_page }}">
+    <header class="navbar">
+        <a href="/" class="brand" aria-label="ScamCheck home">
+            <img class="brand-logo" src="{{ url_for('static', filename='images/scamcheck-logo-header.png') }}" alt="ScamCheck logo">
+
+            <span>
+                <strong data-i18n="brand">ScamCheck</strong>
+                <small data-i18n="tagline">Check before you trust</small>
+            </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Main navigation">
+            <a href="/" class="nav-link {% if current_page == 'home' %}current{% endif %}" {% if current_page == 'home' %}aria-current="page"{% endif %} data-i18n="navHome">Home</a>
+            <a href="/url" class="nav-link {% if current_page == 'url' %}current{% endif %}" {% if current_page == 'url' %}aria-current="page"{% endif %} data-i18n="navUrl">URL</a>
+            <a href="/message" class="nav-link {% if current_page == 'message' %}current{% endif %}" {% if current_page == 'message' %}aria-current="page"{% endif %} data-i18n="navMessage">Message</a>
+            <a href="/pdf" class="nav-link {% if current_page == 'pdf' %}current{% endif %}" {% if current_page == 'pdf' %}aria-current="page"{% endif %} data-i18n="navPdf">PDF</a>
+        </nav>
+
+        <div class="header-actions">
+            <span class="status-pill"><span class="status-dot"></span><span data-i18n="independent">Independent safety tool</span></span>
+            <button id="languageToggle" class="language-toggle" type="button" aria-label="हिन्दी में देखें">हिन्दी</button>
+        </div>
+    </header>
+
+    <aside class="safety-alert" role="note" aria-label="Fraud prevention alert">
+        <span class="safety-alert-icon" aria-hidden="true">!</span>
+        <div>
+            <strong data-i18n="alertTitle">Fraud safety alert</strong>
+            <p data-i18n="alertBody">A real bank or official will never ask for your OTP, UPI PIN, or password. Do not rush to pay or install an app; verify using a number you already trust.</p>
+        </div>
+    </aside>
+
+    <main class="container">
+        <section class="hero">
+            <p class="eyebrow" data-i18n="eyebrow">INDIA · ONLINE SAFETY</p>
+            {% if current_page == 'home' %}
+            <h1 data-i18n="heroTitle">Stop. Check. Then act.</h1>
+            <p><span data-i18n="heroBody">Not sure about a message or link? Check it here before you reply, click, or send money.</span></p>
+            {% else %}
+            <h1 data-i18n="{{ current_page }}HeroTitle">Check a message safely</h1>
+            <p><span data-i18n="{{ current_page }}HeroBody">Use this simple checker to look for warning signs.</span></p>
+            {% endif %}
+            <p class="official-notice" data-i18n="notOfficial">An independent public safety tool. This is not an official Government of India website.</p>
+        </section>
+
+        {% if current_page == 'home' %}
+        <section class="home-tools" aria-labelledby="toolsHeading">
+            <div class="section-heading home-tools-heading">
+                <p class="eyebrow" data-i18n="toolsLabel">QUICK HELP</p>
+                <h2 id="toolsHeading" data-i18n="toolsTitle">What would you like to check?</h2>
+                <p data-i18n="toolsHelp">Choose one option. We will guide you step by step.</p>
+            </div>
+            <div class="tool-grid">
+                <a class="tool-card tool-link" href="/url">
+                    <span class="tool-icon" aria-hidden="true">🔗</span>
+                    <span class="tool-card-copy"><strong data-i18n="homeUrlTitle">Check a link</strong><small data-i18n="homeUrlBody">Paste a website link that looks suspicious.</small></span>
+                    <span class="tool-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="tool-card tool-message" href="/message">
+                    <span class="tool-icon" aria-hidden="true">💬</span>
+                    <span class="tool-card-copy"><strong data-i18n="homeMessageTitle">Check a message</strong><small data-i18n="homeMessageBody">Check a text, SMS, or chat message.</small></span>
+                    <span class="tool-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="tool-card tool-pdf" href="/pdf">
+                    <span class="tool-icon" aria-hidden="true">📄</span>
+                    <span class="tool-card-copy"><strong data-i18n="homePdfTitle">Check a PDF</strong><small data-i18n="homePdfBody">Choose a notice, bill, or offer PDF.</small></span>
+                    <span class="tool-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="tool-card tool-image" href="/screenshot">
+                    <span class="tool-icon" aria-hidden="true">🖼️</span>
+                    <span class="tool-card-copy"><strong data-i18n="homeImageTitle">Check a screenshot</strong><small data-i18n="homeImageBody">Choose a picture of a suspicious message.</small></span>
+                    <span class="tool-arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="scanner-card {% if current_page == 'home' %}hidden{% endif %}">
+            <div class="scan-tabs" role="tablist" aria-label="Choose what you want to check" hidden>
+                <button id="messageTab" class="tab-button active" type="button" role="tab" aria-selected="true" aria-controls="messagePanel" data-tab="message">
+                    <span>💬</span>
+                    <span data-i18n="tabMessage">Message</span>
+                </button>
+
+                <button id="urlTab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="urlPanel" data-tab="url" tabindex="-1">
+                    <span>🔗</span>
+                    <span data-i18n="tabLink">Link</span>
+                </button>
+
+                <button id="imageTab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="imagePanel" data-tab="image" tabindex="-1">
+                    <span>🖼</span>
+                    <span data-i18n="tabImage">Screenshot</span>
+                </button>
+
+                <button id="pdfTab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="pdfPanel" data-tab="pdf" tabindex="-1">
+                    <span>📄</span>
+                    <span data-i18n="tabPdf">PDF file</span>
+                </button>
+            </div>
+
+            <form id="scanForm" enctype="multipart/form-data">
+                <input
+                    type="hidden"
+                    id="scanType"
+                    name="scan_type"
+                    value="{{ current_page if current_page in ['message', 'url', 'image', 'pdf'] else 'message' }}"
+                >
+
+                <!-- MESSAGE PANEL -->
+                <div id="messagePanel" class="scan-panel {% if current_page == 'message' %}active{% endif %}" role="tabpanel" aria-labelledby="messageTab" {% if current_page != 'message' %}hidden{% endif %}>
+                    <div class="panel-heading">
+                        <h2 data-i18n="messageTitle">Check a message</h2>
+                        <p data-i18n="messageHelp">Paste the message you received. You can use Hindi or English.</p>
+                    </div>
+
+                    <label for="messageInput" data-i18n="messageLabel">Paste message here</label>
+
+                    <textarea
+                        id="messageInput"
+                        name="message"
+                        maxlength="20000"
+                        placeholder="Example: आपका बैंक खाता बंद हो जाएगा। अभी OTP भेजें।"
+                        data-i18n-placeholder="messagePlaceholder"
+                    ></textarea>
+
+                    <p class="input-note">
+                        <span data-i18n="messageNote">Never paste your real password, OTP, PIN, or bank details.</span>
+                    </p>
+                </div>
+
+                <!-- URL PANEL -->
+                <div id="urlPanel" class="scan-panel {% if current_page == 'url' %}active{% endif %}" role="tabpanel" aria-labelledby="urlTab" {% if current_page != 'url' %}hidden{% endif %}>
+                    <div class="panel-heading">
+                        <h2 data-i18n="linkTitle">Check a link</h2>
+                        <p data-i18n="linkHelp">Paste the full link here. We do not open the link.</p>
+                    </div>
+
+                    <label for="urlInput" data-i18n="linkLabel">Paste link here</label>
+
+                    <input
+                        id="urlInput"
+                        name="url"
+                        type="text"
+                        inputmode="url"
+                        maxlength="2048"
+                        placeholder="Example: https://example.com"
+                    >
+
+                    <p class="input-note">
+                        <span data-i18n="linkNote">We check the link address without visiting the website.</span>
+                    </p>
+                </div>
+
+                <!-- IMAGE PANEL -->
+                <div id="imagePanel" class="scan-panel {% if current_page == 'image' %}active{% endif %}" role="tabpanel" aria-labelledby="imageTab" {% if current_page != 'image' %}hidden{% endif %}>
+                    <div class="panel-heading">
+                        <h2 data-i18n="imageTitle">Check a screenshot</h2>
+                        <p data-i18n="imageHelp">Choose a clear screenshot of the message. Hindi and English text work best.</p>
+                    </div>
+
+                    <label for="imageInput" data-i18n="imageLabel">Choose screenshot</label>
+
+                    <div class="file-upload-box">
+                        <input
+                            id="imageInput"
+                            name="image"
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                        >
+
+                        <div class="file-upload-content">
+                            <span class="upload-icon">⬆</span>
+                            <strong data-i18n="imageChoose">Tap to choose a screenshot</strong>
+                            <small data-i18n="imageLimit">PNG, JPG or WEBP · Up to 10 MB</small>
+                        </div>
+                    </div>
+
+                    <p id="selectedImageName" class="selected-file"></p>
+
+                    <p class="input-note">
+                        <span data-i18n="imageNote">Text is read from the screenshot. Hindi reading needs Hindi OCR language data installed.</span>
+                    </p>
+                </div>
+
+                <!-- PDF PANEL -->
+                <div id="pdfPanel" class="scan-panel {% if current_page == 'pdf' %}active{% endif %}" role="tabpanel" aria-labelledby="pdfTab" {% if current_page != 'pdf' %}hidden{% endif %}>
+                    <div class="panel-heading">
+                        <h2 data-i18n="pdfTitle">Check a PDF file</h2>
+                        <p data-i18n="pdfHelp">Choose a PDF message, bill, notice, or offer to check its readable text.</p>
+                    </div>
+                    <label for="pdfInput" data-i18n="pdfLabel">Choose PDF file</label>
+                    <input id="pdfInput" name="pdf" type="file" accept="application/pdf,.pdf" class="pdf-input">
+                    <p id="selectedPdfName" class="selected-file"></p>
+                    <p class="input-note" data-i18n="pdfNote">PDFs in different languages can be checked. Image-only scanned PDFs cannot be read yet.</p>
+                </div>
+
+                <button id="scanButton" class="scan-button" type="submit">
+                    <span id="scanButtonIcon" aria-hidden="true">🔍</span>
+                    <span id="scanButtonText" data-i18n="scanButton">Check now</span>
+                </button>
+                <p class="language-capability" data-i18n="languageCapability">English, Hindi and common Hinglish warnings are checked offline. Other languages need the optional AI service.</p>
+                <p class="privacy-notice" data-i18n="privacyNote">If AI checking is enabled, text you submit may be sent to Google. Do not enter passwords, OTPs, or bank details.</p>
+            </form>
+        </section>
+
+        <section id="resultSection" class="result-section hidden">
+            <div class="result-top">
+                <div>
+                    <p class="eyebrow" data-i18n="reportLabel">YOUR CHECK RESULT</p>
+                    <h2 data-i18n="reportTitle">Safety check</h2>
+                </div>
+
+                <span id="riskBadge" class="risk-badge">Analyzing</span>
+            </div>
+
+            <div class="result-summary" aria-live="polite" aria-atomic="true">
+                <div id="scoreCircle" class="score-circle safe">
+                    <span id="riskScore">0</span>
+                    <small>/ 100</small>
+                </div>
+
+                <div class="summary-text">
+                    <h3 id="riskTitle" data-i18n="waiting">Ready to check</h3>
+                    <p class="score-description" data-i18n="scoreDescription">A higher score means more warning signs were found. It does not prove a scam.</p>
+                    <p id="riskSummary" data-i18n="waitingHelp">Your result and next steps will appear here.</p>
+                </div>
+            </div>
+
+            <div class="result-columns">
+                <article class="result-card">
+                    <div class="card-title">
+                        <span>⚠</span>
+                        <h3 data-i18n="whyResult">Why are we showing this?</h3>
+                    </div>
+
+                    <ul id="reasonsList" class="result-list">
+                        <li>No scan has been completed yet.</li>
+                    </ul>
+                    <ul id="reasonsListHi" class="result-list hindi-result hidden" lang="hi"></ul>
+                </article>
+
+                <article class="result-card">
+                    <div class="card-title">
+                        <span>✓</span>
+                        <h3 data-i18n="nextSteps">What should I do?</h3>
+                    </div>
+
+                    <ul id="recommendationsList" class="result-list">
+                        <li>Never share OTPs, passwords, PINs, CVV numbers, or bank details.</li>
+                    </ul>
+                    <ul id="recommendationsListHi" class="result-list hindi-result hidden" lang="hi"></ul>
+                </article>
+            </div>
+
+            <article id="extractedTextCard" class="result-card extracted-card hidden">
+                <div class="card-title">
+                    <span>🔤</span>
+                    <h3 data-i18n="extractedTitle">Text read from your file</h3>
+                </div>
+
+                <p id="extractedText" class="extracted-text"></p>
+            </article>
+
+            <details class="technical-response">
+                <summary data-i18n="technical">View technical details</summary>
+                <pre id="rawResponse"></pre>
+            </details>
+        </section>
+
+        {% if current_page == 'home' %}
+        <section class="tips-section">
+            <div class="section-heading">
+                <p class="eyebrow" data-i18n="tipsLabel">STAY SAFE</p>
+                <h2 data-i18n="tipsTitle">Simple ways to avoid online fraud</h2>
+            </div>
+
+            <div class="tips-grid">
+                <article class="tip-card">
+                    <span class="tip-icon">🔐</span>
+                    <h3>Never share secret codes</h3>
+                    <p>Never share an OTP, password, UPI PIN, ATM PIN, CVV, or card number with anyone.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon">🔗</span>
+                    <h3>Verify before clicking</h3>
+                    <p>Do not trust links that create urgency, fear, prizes, refunds, or fake account-blocking warnings.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon">☎</span>
+                    <h3>Use official channels</h3>
+                    <p>Open official apps or type the official website manually instead of trusting a message link.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon" aria-hidden="true">🔑</span>
+                    <h3>Use unique passwords and MFA</h3>
+                    <p>Create a different, long password for each important account. Turn on multi-factor authentication and never approve a sign-in you did not start.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon" aria-hidden="true">💸</span>
+                    <h3>Pause before sending money</h3>
+                    <p>Verify payment requests with the person or business using a known number. Never pay a fee to receive a prize, refund, or job offer.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon" aria-hidden="true">🛠</span>
+                    <h3>Keep devices protected</h3>
+                    <p>Install software updates, use a screen lock, and download apps only from trusted stores. Avoid opening unexpected attachments.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon" aria-hidden="true">🧭</span>
+                    <h3>Check the sender and address</h3>
+                    <p>Look closely for misspelled domains and unexpected sender details. A familiar logo or HTTPS padlock alone does not prove a message is genuine.</p>
+                </article>
+
+                <article class="tip-card">
+                    <span class="tip-icon" aria-hidden="true">🚨</span>
+                    <h3>Act quickly if you are targeted</h3>
+                    <p>Stop communicating, contact your bank through its official app or number if money or account access is at risk, then report and block the sender.</p>
+                </article>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p data-i18n="footerBrand">ScamCheck · Independent online safety tool</p>
+        <p data-i18n="footerDisclaimer">This tool can miss fraud. When in doubt, do not click or send money.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
