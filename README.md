@@ -1,5 +1,9 @@
 # ScamCheck
 NOTE:_This website is totaly maide by Ai . only instructions ,workflow idea and prompt given by me .
+
+
+
+
 ScamCheck is an independent, bilingual cyber-safety tool for checking suspicious messages, links, screenshots, and text-based PDF files. Its interface is available in English and Hindi. It is not a Government of India service.
 
 Offline rules check English, Hindi, and common Hinglish fraud signals. Other languages require the optional Gemini service (`GEMINI_API_KEY`). When Gemini is configured, submitted text and extracted file text are sent to Google for analysis. Image OCR supports English and Hindi when the corresponding Tesseract language packs are installed. Text-based PDF extraction preserves Unicode text; scanned PDFs without selectable text are not supported yet. Do not submit passwords, OTPs, PINs, or other sensitive personal information.
